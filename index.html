@@ -88,6 +88,73 @@ header {
 }
 .admin-btn:hover { border-color: var(--sage-light); color: var(--white); }
 
+/* ── LANDING SCREEN ── */
+#landingScreen {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--green-dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.5s, transform 0.5s;
+}
+#landingScreen.hide {
+  opacity: 0; pointer-events: none;
+  transform: scale(1.04);
+}
+.landing-logo {
+  font-size: 3.5rem; margin-bottom: 0.5rem;
+}
+.landing-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 6vw, 3rem);
+  color: var(--white); font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.landing-sub {
+  font-size: 0.78rem; color: var(--sage-light);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+.landing-prompt {
+  font-size: 0.82rem; color: var(--sage-light);
+  margin-bottom: 1.4rem; letter-spacing: 0.05em;
+}
+.landing-choices {
+  display: flex; gap: 1.2rem;
+  flex-wrap: wrap; justify-content: center;
+}
+.choice-card {
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 2rem 2.4rem;
+  text-align: center; cursor: pointer;
+  transition: all 0.25s; min-width: 160px;
+  color: var(--white);
+}
+.choice-card:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: var(--sage-light);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+.choice-card:active { transform: scale(0.97); }
+.choice-emoji { font-size: 2.8rem; margin-bottom: 0.7rem; display: block; }
+.choice-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 600;
+  display: block; margin-bottom: 0.3rem;
+}
+.choice-desc { font-size: 0.72rem; color: var(--sage-light); letter-spacing: 0.04em; }
+
+.landing-divider {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 2rem 0 1.5rem; width: 340px; max-width: 90vw;
+}
+.landing-divider::before, .landing-divider::after {
+  content:''; flex:1; height:1px; background: rgba(255,255,255,0.1);
+}
+.landing-divider span { font-size: 0.7rem; color: var(--sage); letter-spacing: 0.1em; }
+
 /* ── HERO ── */
 .hero {
   text-align: center;
@@ -353,12 +420,34 @@ body.night footer { border-top-color: var(--night-border); color: #4E7261; }
 </head>
 <body>
 
+<!-- LANDING SCREEN -->
+<div id="landingScreen">
+  <div class="landing-logo">☕</div>
+  <div class="landing-title">Trio's Café Made by Kija Maharjan</div>
+  <div class="landing-sub">Kathmandu · Est. 2024</div>
+  <div class="landing-prompt">Which menu would you like to see?</div>
+  <div class="landing-choices">
+    <div class="choice-card" onclick="chooseLanding('day')">
+      <span class="choice-emoji">☀️</span>
+      <span class="choice-label">Day Menu</span>
+      <span class="choice-desc">Morning & afternoon</span>
+    </div>
+    <div class="choice-card" onclick="chooseLanding('night')">
+      <span class="choice-emoji">🌙</span>
+      <span class="choice-label">Night Menu</span>
+      <span class="choice-desc">Evening & late night</span>
+    </div>
+  </div>
+  <div class="landing-divider"><span>OR</span></div>
+  <div style="cursor:pointer;color:var(--sage-light);font-size:0.78rem;text-decoration:underline;text-underline-offset:3px;" onclick="chooseLanding('both')">View full menu (all items)</div>
+</div>
+
 <!-- HEADER -->
 <header>
   <div class="logo-area">
     <div class="logo-icon">☕</div>
     <div>
-      <div class="logo-text">Trio's Cafe Menu Made by Kija Maharjan</div>
+      <div class="logo-text">Trio's Café</div>
       <div class="logo-sub">Kathmandu</div>
     </div>
   </div>
@@ -386,7 +475,7 @@ body.night footer { border-top-color: var(--night-border); color: #4E7261; }
 <div class="content" id="menuContent"></div>
 
 <!-- FOOTER -->
-<footer>☕ Trio's Café · Kathmandu · trios-menu.kijamaharjan.xyz</footer>
+<footer>☕ Trio's Café · Kathmandu · trios-menu.kijamaharjan.xyz<br><span style="font-size:0.65rem;opacity:0.6;">Made by Kija Maharjan</span></footer>
 
 <!-- PIN OVERLAY -->
 <div class="overlay" id="pinOverlay">
@@ -624,6 +713,47 @@ function getShift(cat, name) {
   return itemShifts[cat+'|'+name] || 'both';
 }
 
+// ── LANDING ──
+function chooseLanding(shift) {
+  const screen = document.getElementById('landingScreen');
+  screen.classList.add('hide');
+  setTimeout(() => screen.style.display = 'none', 500);
+  if (shift === 'both') {
+    // show both — day toggle active by default but display all
+    currentShift = 'day';
+    document.getElementById('togDay').classList.add('active');
+    document.getElementById('togNight').classList.remove('active');
+    document.getElementById('shiftLabel').textContent = 'Showing Full Menu';
+    renderMenuAll();
+  } else {
+    setShift(shift);
+  }
+}
+
+function renderMenuAll() {
+  const content = document.getElementById('menuContent');
+  let html = '';
+  Object.entries(MENU).forEach(([cat, data]) => {
+    html += `<div class="cat-section">
+      <div class="cat-header">
+        <span class="cat-icon">${data.icon}</span>
+        <span class="cat-name">${cat}</span>
+        <span class="cat-count">${data.items.length}</span>
+      </div>`;
+    data.items.forEach(item => {
+      html += `<div class="item-row">
+        <div class="item-left">
+          <span class="item-emoji">${data.icon}</span>
+          <span class="item-name">${item.name}</span>
+        </div>
+        <span class="item-price"><span class="currency">Rs. </span>${item.price}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('menuContent').innerHTML = html;
+}
+
 // ── SHIFT TOGGLE ──
 function setShift(shift) {
   currentShift = shift;
@@ -772,7 +902,7 @@ function setItemShift(key, shift, btn) {
 
 // ── INIT ──
 loadShifts();
-renderMenu();
+// Menu renders after landing screen choice
 </script>
 </body>
 </html>
