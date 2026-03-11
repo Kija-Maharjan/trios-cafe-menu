@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trio's Café — Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage:       #7A9E87;
+  --sage-dark:  #4E7261;
+  --sage-light: #B8D0BE;
+  --sage-pale:  #E8F2EB;
+  --cream:      #F7F2E8;
+  --parchment:  #EDE6D4;
+  --wheat:      #C4A882;
+  --ink:        #2C3E2D;
+  --muted:      #7A8C78;
+  --white:      #FDFAF4;
+  --green-dark: #1A3C2E;
+  --red:        #B05040;
+  --night-bg:   #1A2420;
+  --night-card: #22302A;
+  --night-border:#2E4038;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  transition: background 0.4s, color 0.4s;
+}
+
+body.night {
+  background: var(--night-bg);
+  color: #D4E8D8;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--green-dark);
+  padding: 0 2rem;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+}
+
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.logo-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--sage-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+}
+.logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--white); font-weight: 600; }
+.logo-sub { font-size: 0.62rem; color: var(--sage-light); letter-spacing: 0.15em; text-transform: uppercase; margin-top: -2px; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+/* Day/Night Toggle */
+.toggle-wrap {
+  display: flex;
+  background: rgba(255,255,255,0.1);
+  border-radius: 30px;
+  padding: 4px;
+  gap: 2px;
+}
+.tog-btn {
+  padding: 6px 16px; border: none; border-radius: 24px;
+  font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; transition: all 0.22s; background: none; color: rgba(255,255,255,0.6);
+}
+.tog-btn.active {
+  background: var(--white); color: var(--green-dark); font-weight: 600;
+}
+
+.admin-btn {
+  background: none; border: 1.5px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.7); border-radius: 8px;
+  padding: 6px 14px; font-family: 'Jost', sans-serif;
+  font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.admin-btn:hover { border-color: var(--sage-light); color: var(--white); }
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 3.5rem 2rem 2rem;
+  background: linear-gradient(180deg, rgba(26,60,46,0.06) 0%, transparent 100%);
+}
+body.night .hero { background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 100%); }
+
+.hero-badge {
+  display: inline-block;
+  background: var(--sage-pale);
+  color: var(--sage-dark);
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 1rem; font-weight: 600;
+}
+body.night .hero-badge { background: rgba(122,158,135,0.15); color: var(--sage-light); }
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 600; line-height: 1.15;
+  color: var(--ink); margin-bottom: 0.6rem;
+}
+body.night .hero h1 { color: #D4E8D8; }
+
+.hero-sub { font-size: 0.88rem; color: var(--muted); }
+body.night .hero-sub { color: #7A9E87; }
+
+.shift-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 1.2rem;
+  background: var(--white); border: 1.5px solid var(--parchment);
+  border-radius: 30px; padding: 8px 20px;
+  font-size: 0.82rem; font-weight: 600; color: var(--ink);
+}
+body.night .shift-label { background: var(--night-card); border-color: var(--night-border); color: #D4E8D8; }
+.shift-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); }
+body.night .shift-dot { background: #4E9A6E; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── MAIN CONTENT ── */
+.content {
+  max-width: 820px; margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+}
+
+/* Category section */
+.cat-section { margin-bottom: 2rem; }
+.cat-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0.7rem 0; margin-bottom: 0.5rem;
+  border-bottom: 2px solid var(--parchment);
+  position: sticky; top: 70px; z-index: 10;
+  background: var(--cream);
+}
+body.night .cat-header { border-bottom-color: var(--night-border); background: var(--night-bg); }
+
+.cat-icon { font-size: 1.3rem; }
+.cat-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 600; color: var(--ink);
+}
+body.night .cat-name { color: #C8E0CC; }
+.cat-count {
+  font-size: 0.65rem; color: var(--muted);
+  background: var(--parchment); border-radius: 10px;
+  padding: 2px 8px; font-weight: 600;
+}
+body.night .cat-count { background: var(--night-border); color: #7A9E87; }
+
+/* Item row */
+.item-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(212,184,150,0.2);
+}
+.item-row:last-child { border-bottom: none; }
+.item-row:hover { background: var(--sage-pale); }
+body.night .item-row:hover { background: rgba(122,158,135,0.08); }
+
+.item-left { display: flex; align-items: center; gap: 10px; }
+.item-emoji { font-size: 1.1rem; width: 28px; text-align: center; }
+.item-name { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+body.night .item-name { color: #C8E0CC; }
+.item-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--sage-dark);
+}
+body.night .item-price { color: var(--sage-light); }
+.item-price .currency { font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-right: 1px; }
+
+.no-items {
+  text-align: center; padding: 2rem;
+  color: var(--muted); font-size: 0.85rem; opacity: 0.6;
+}
+
+/* ── ADMIN OVERLAY ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(26,60,46,0.6);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.overlay.show { opacity: 1; pointer-events: all; }
+
+/* PIN Modal */
+.pin-modal {
+  background: var(--white); border-radius: 20px;
+  padding: 2.2rem 2rem; width: 320px; text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.3s;
+}
+.overlay.show .pin-modal { transform: scale(1) translateY(0); }
+.pin-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+.pin-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 0.3rem; }
+.pin-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+.pin-display {
+  display: flex; justify-content: center; gap: 10px; margin-bottom: 1.4rem;
+}
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--parchment); background: transparent;
+  transition: all 0.18s;
+}
+.pin-dot.filled { background: var(--sage-dark); border-color: var(--sage-dark); }
+.pin-dot.error { background: var(--red); border-color: var(--red); }
+
+.pin-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 1rem;
+}
+.pin-key {
+  background: var(--cream); border: 1.5px solid var(--parchment);
+  border-radius: 12px; padding: 14px;
+  font-size: 1.1rem; font-weight: 600; color: var(--ink);
+  cursor: pointer; transition: all 0.15s; font-family: 'Jost', sans-serif;
+}
+.pin-key:hover { background: var(--sage-pale); border-color: var(--sage-light); }
+.pin-key:active { transform: scale(0.94); }
+.pin-key.del { font-size: 0.9rem; color: var(--muted); }
+.pin-key.zero { grid-column: 2; }
+
+.pin-cancel {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Jost', sans-serif; font-size: 0.82rem;
+  cursor: pointer; padding: 6px 12px;
+}
+.pin-cancel:hover { color: var(--red); }
+
+.pin-error-msg {
+  font-size: 0.75rem; color: var(--red);
+  margin-bottom: 0.8rem; min-height: 18px;
+}
+
+/* ── ADMIN PANEL ── */
+.admin-panel {
+  background: var(--white); border-radius: 20px;
+  width: min(96vw, 780px); max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  transform: scale(0.95) translateY(12px);
+  transition: transform 0.3s; overflow: hidden;
+}
+.overlay.show .admin-panel { transform: scale(1) translateY(0); }
+
+.admin-head {
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--parchment);
+  background: var(--green-dark);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.admin-head-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--white); }
+.admin-close {
+  background: rgba(255,255,255,0.15); border: none; color: var(--white);
+  border-radius: 8px; padding: 5px 14px; font-family: 'Jost', sans-serif;
+  font-size: 0.78rem; cursor: pointer;
+}
+.admin-close:hover { background: rgba(255,255,255,0.25); }
+
+.admin-note {
+  padding: 0.6rem 1.5rem;
+  background: var(--sage-pale);
+  font-size: 0.75rem; color: var(--sage-dark);
+  border-bottom: 1px solid var(--parchment);
+  flex-shrink: 0;
+}
+
+.admin-body { overflow-y: auto; flex: 1; padding: 1rem 1.5rem; }
+
+.admin-cat-section { margin-bottom: 1.5rem; }
+.admin-cat-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 600; color: var(--ink);
+  padding: 0.5rem 0; border-bottom: 1px solid var(--parchment);
+  margin-bottom: 0.5rem;
+}
+
+.admin-item-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 100px;
+  gap: 8px; align-items: center;
+  padding: 6px 8px; border-radius: 8px;
+  border-bottom: 1px solid rgba(212,184,150,0.15);
+  font-size: 0.82rem;
+}
+.admin-item-row:last-child { border-bottom: none; }
+.admin-item-row:hover { background: var(--cream); }
+.admin-item-name { color: var(--ink); font-weight: 500; }
+
+.shift-toggle {
+  display: flex; border-radius: 8px; overflow: hidden;
+  border: 1.5px solid var(--parchment);
+}
+.st-btn {
+  flex: 1; padding: 4px 0; border: none; background: none;
+  font-family: 'Jost', sans-serif; font-size: 0.65rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.st-btn.day.active   { background: #FFF9C4; color: #7A5A00; }
+.st-btn.night.active { background: #C5CAE9; color: #1A237E; }
+.st-btn.both.active  { background: var(--sage-pale); color: var(--sage-dark); }
+
+.admin-save-bar {
+  padding: 1rem 1.5rem; border-top: 1px solid var(--parchment);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--cream); flex-shrink: 0;
+}
+.btn-save {
+  background: var(--sage-dark); color: var(--white);
+  border: none; border-radius: 10px;
+  padding: 10px 28px; font-family: 'Jost', sans-serif;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover { background: var(--green-dark); }
+.save-note { font-size: 0.72rem; color: var(--muted); }
+
+/* Footer */
+footer {
+  text-align: center; padding: 2rem;
+  font-size: 0.72rem; color: var(--muted);
+  border-top: 1px solid var(--parchment);
+}
+body.night footer { border-top-color: var(--night-border); color: #4E7261; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  header { padding: 0 1rem; }
+  .logo-sub { display: none; }
+  .content { padding: 1rem 1rem 4rem; }
+  .admin-item-row { grid-template-columns: 1fr; gap: 4px; }
+  .admin-item-row .shift-toggle { max-width: 200px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">☕</div>
+    <div>
+      <div class="logo-text">Trio's Café</div>
+      <div class="logo-sub">Kathmandu</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="toggle-wrap">
+      <button class="tog-btn active" id="togDay" onclick="setShift('day')">☀️ Day</button>
+      <button class="tog-btn" id="togNight" onclick="setShift('night')">🌙 Night</button>
+    </div>
+    <button class="admin-btn" onclick="openPin()">🔐 Admin</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Fresh · Handcrafted · Kathmandu</div>
+  <h1>Our Menu</h1>
+  <p class="hero-sub">Made with care, served with warmth</p>
+  <div class="shift-label">
+    <span class="shift-dot"></span>
+    <span id="shiftLabel">Showing Day Menu</span>
+  </div>
+</div>
+
+<!-- MENU CONTENT -->
+<div class="content" id="menuContent"></div>
+
+<!-- FOOTER -->
+<footer>☕ Trio's Café · Kathmandu · trios-menu.kijamaharjan.xyz</footer>
+
+<!-- PIN OVERLAY -->
+<div class="overlay" id="pinOverlay">
+  <div class="pin-modal">
+    <div class="pin-icon">🔐</div>
+    <div class="pin-title">Admin Access</div>
+    <div class="pin-sub">Enter your 4-digit PIN</div>
+    <div class="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error-msg" id="pinError"></div>
+    <div class="pin-grid">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+      <button class="pin-key zero" onclick="pinKey('0')">0</button>
+    </div>
+    <button class="pin-cancel" onclick="closePin()">Cancel</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL OVERLAY -->
+<div class="overlay" id="adminOverlay">
+  <div class="admin-panel">
+    <div class="admin-head">
+      <div class="admin-head-title">⚙️ Admin — Menu Manager</div>
+      <button class="admin-close" onclick="closeAdmin()">✕ Close</button>
+    </div>
+    <div class="admin-note">
+      Set each item to <strong>Day</strong>, <strong>Night</strong>, or <strong>Both</strong> shifts. Changes save instantly to your browser.
+    </div>
+    <div class="admin-body" id="adminBody"></div>
+    <div class="admin-save-bar">
+      <span class="save-note">✅ Changes auto-saved to this device</span>
+      <button class="btn-save" onclick="saveAndClose()">Save & Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── FULL MENU ──
+const MENU = {
+  'Breakfast': {
+    icon: '🍳',
+    items: [
+      { name: 'Boiled Egg (2pc)',    price: 60  },
+      { name: 'Poached Egg (2pc)',   price: 80  },
+      { name: 'Scrambled Egg (2pc)', price: 80  },
+      { name: 'Omelette (2pc)',      price: 90  },
+    ]
+  },
+  'Food Menu': {
+    icon: '🥟',
+    items: [
+      { name: 'Veg Momo Steam',       price: 115 },
+      { name: 'Buff Momo Steam',      price: 135 },
+      { name: 'Chicken Momo Steam',   price: 160 },
+      { name: 'Veg Momo Fry',         price: 130 },
+      { name: 'Buff Momo Fry',        price: 160 },
+      { name: 'Chicken Momo Fry',     price: 180 },
+      { name: 'Buff Momo Chilly',     price: 180 },
+      { name: 'Chicken Momo Chilly',  price: 210 },
+      { name: 'Veg Chowmein',         price: 110 },
+      { name: 'Buff Chowmein',        price: 140 },
+      { name: 'Chicken Chowmein',     price: 160 },
+      { name: 'Mix Chowmein',         price: 230 },
+      { name: 'Veg Thukpa',           price: 130 },
+      { name: 'Buff Thukpa',          price: 170 },
+      { name: 'Chicken Thukpa',       price: 190 },
+      { name: 'Buff Fried Rice',      price: 180 },
+    ]
+  },
+  'Snacks': {
+    icon: '🍟',
+    items: [
+      { name: 'Aalu Paalu',        price: 80  },
+      { name: 'Aalu Jeera',        price: 110 },
+      { name: 'Foksho Half',       price: 120 },
+      { name: 'Foksho Full',       price: 200 },
+      { name: 'Pangra (Fry/Gravy)',price: 200 },
+      { name: 'Buff Bhutan',       price: 140 },
+      { name: 'Drum Stick',        price: 40  },
+      { name: 'Wings',             price: 90  },
+      { name: 'Anda Chiura',       price: 110 },
+      { name: 'Buff Sausage',      price: 45  },
+      { name: 'Chicken Sausage',   price: 60  },
+    ]
+  },
+  'Appetizer': {
+    icon: '🥗',
+    items: [
+      { name: 'Chauchau Sadheko',    price: 100 },
+      { name: 'Bhatmas Sadheko',     price: 130 },
+      { name: 'Badam Sadheko',       price: 170 },
+      { name: 'Badam & Bhatmas',     price: 200 },
+      { name: 'Papad (4 pcs)',        price: 100 },
+      { name: 'Buff Sausage',        price: 130 },
+      { name: 'Buff Choila',         price: 250 },
+      { name: 'Buff Sukuti',         price: 310 },
+      { name: 'Buff Chilly',         price: 340 },
+      { name: 'Chicken Sausage',     price: 170 },
+      { name: 'Chicken Boiled',      price: 290 },
+      { name: 'Chicken Fried',       price: 275 },
+      { name: 'Chicken Roasted',     price: 315 },
+      { name: 'Chicken Chilly',      price: 315 },
+      { name: 'Nuggets (10 pcs)',    price: 250 },
+      { name: 'Meatball (12 pcs)',   price: 250 },
+      { name: 'Chicken Sadheko',     price: 295 },
+      { name: 'Pork Fried',          price: 295 },
+      { name: 'Pork Chilli',         price: 350 },
+      { name: 'Pork Tawa',           price: 380 },
+      { name: 'Wai Wai Plain',       price: 60  },
+      { name: 'Wai Wai Egg',         price: 90  },
+      { name: 'Wai Wai Mix',         price: 150 },
+      { name: 'Chowchow Plain',      price: 80  },
+      { name: 'Chowchow Egg',        price: 120 },
+      { name: 'Chowchow Mix',        price: 180 },
+      { name: 'French Fries Half',   price: 150 },
+      { name: 'French Fries Full',   price: 250 },
+      { name: 'Peri Peri Fries Half',price: 180 },
+      { name: 'Chips Chilly',        price: 220 },
+      { name: 'Mustang Aalu',        price: 140 },
+      { name: 'Mix Veg Soup',        price: 110 },
+      { name: 'Mushroom Soup',       price: 120 },
+      { name: 'Chicken Soup',        price: 130 },
+      { name: 'Green Salad',         price: 130 },
+      { name: 'Vegetable Boil',      price: 150 },
+      { name: 'Pop Corn',            price: 60  },
+      { name: 'Butter Pop Corn',     price: 100 },
+    ]
+  },
+  'Hot Drinks': {
+    icon: '☕',
+    items: [
+      { name: 'Black Tea',           price: 20  },
+      { name: 'Lemon Tea',           price: 30  },
+      { name: 'Milk Tea',            price: 35  },
+      { name: 'Masala Milk Tea',     price: 45  },
+      { name: 'Black Coffee',        price: 60  },
+      { name: 'Strong Black Coffee', price: 70  },
+      { name: 'Milk Coffee',         price: 90  },
+      { name: 'Hot Lemon',           price: 60  },
+      { name: 'Hot Lemon & Honey',   price: 110 },
+      { name: 'Lemon Honey Ginger',  price: 130 },
+      { name: 'Apple Tea',           price: 45  },
+      { name: 'Peach Tea',           price: 45  },
+      { name: 'Vanilla Tea',         price: 45  },
+      { name: 'Special Peach Tea',   price: 80  },
+      { name: 'Special Lemon Tea',   price: 80  },
+    ]
+  },
+  'Cold Drinks': {
+    icon: '🧊',
+    items: [
+      { name: 'Coke / Fanta / Sprite', price: 70  },
+      { name: 'Cold Coffee',           price: 150 },
+      { name: 'Peach Iced Tea',        price: 150 },
+      { name: 'Lemon Iced Tea',        price: 150 },
+      { name: 'Apple Iced Tea',        price: 150 },
+      { name: 'Cranberry Juice',       price: 400 },
+      { name: 'Redbull',               price: 140 },
+      { name: 'Xtreme',                price: 160 },
+      { name: 'Badam Juice',           price: 120 },
+      { name: 'Mocha Latte',           price: 120 },
+    ]
+  },
+  'Alcoholic': {
+    icon: '🍺',
+    items: [
+      { name: 'Golden Oak (90ml)',  price: 190  },
+      { name: 'Mustang (90ml)',     price: 220  },
+      { name: 'Black Oak (90ml)',   price: 260  },
+      { name: 'Khukuri Rum (90ml)', price: 350  },
+      { name: 'Old Durbar (90ml)', price: 490  },
+      { name: '8848 Vodka (Full)',  price: 1400 },
+      { name: 'Tuborg (Bottle)',    price: 500  },
+      { name: 'Tuborg (Can)',       price: 440  },
+      { name: 'Nepal Ice (L)',      price: 420  },
+      { name: 'Gorkha Strong (L)',  price: 440  },
+      { name: 'Gorkha Strong (S)',  price: 230  },
+      { name: 'Manang Wine',        price: 1400 },
+    ]
+  },
+};
+
+// ── STATE ──
+const CORRECT_PIN = '5867';
+let currentShift = 'day';
+let pinEntry = '';
+let itemShifts = {};  // { 'Category|ItemName': 'day'|'night'|'both' }
+
+// Load saved shifts from localStorage
+function loadShifts() {
+  try {
+    const saved = localStorage.getItem('triosMenuShifts');
+    if (saved) itemShifts = JSON.parse(saved);
+    else initDefaultShifts();
+  } catch(e) { initDefaultShifts(); }
+}
+
+function initDefaultShifts() {
+  Object.entries(MENU).forEach(([cat, data]) => {
+    data.items.forEach(item => {
+      itemShifts[cat+'|'+item.name] = 'both';
+    });
+  });
+}
+
+function saveShifts() {
+  localStorage.setItem('triosMenuShifts', JSON.stringify(itemShifts));
+}
+
+function getShift(cat, name) {
+  return itemShifts[cat+'|'+name] || 'both';
+}
+
+// ── SHIFT TOGGLE ──
+function setShift(shift) {
+  currentShift = shift;
+  document.getElementById('togDay').classList.toggle('active', shift === 'day');
+  document.getElementById('togNight').classList.toggle('active', shift === 'night');
+  document.getElementById('shiftLabel').textContent = shift === 'day' ? 'Showing Day Menu' : 'Showing Night Menu';
+  document.body.classList.toggle('night', shift === 'night');
+  renderMenu();
+}
+
+// ── RENDER PUBLIC MENU ──
+function renderMenu() {
+  const content = document.getElementById('menuContent');
+  let html = '';
+  Object.entries(MENU).forEach(([cat, data]) => {
+    const visible = data.items.filter(item => {
+      const s = getShift(cat, item.name);
+      return s === 'both' || s === currentShift;
+    });
+    if (!visible.length) return;
+    html += `<div class="cat-section">
+      <div class="cat-header">
+        <span class="cat-icon">${data.icon}</span>
+        <span class="cat-name">${cat}</span>
+        <span class="cat-count">${visible.length}</span>
+      </div>`;
+    visible.forEach(item => {
+      html += `<div class="item-row">
+        <div class="item-left">
+          <span class="item-emoji">${data.icon}</span>
+          <span class="item-name">${item.name}</span>
+        </div>
+        <span class="item-price"><span class="currency">Rs. </span>${item.price}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  if (!html) html = '<div class="no-items">No items available for this shift.</div>';
+  content.innerHTML = html;
+}
+
+// ── PIN SYSTEM ──
+function openPin() {
+  pinEntry = '';
+  updatePinDisplay();
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinOverlay').classList.add('show');
+}
+function closePin() {
+  document.getElementById('pinOverlay').classList.remove('show');
+  pinEntry = '';
+  updatePinDisplay();
+}
+
+function pinKey(k) {
+  if (pinEntry.length >= 4) return;
+  pinEntry += k;
+  updatePinDisplay();
+  if (pinEntry.length === 4) {
+    setTimeout(checkPin, 150);
+  }
+}
+
+function pinDel() {
+  pinEntry = pinEntry.slice(0, -1);
+  document.getElementById('pinError').textContent = '';
+  updatePinDisplay();
+}
+
+function updatePinDisplay() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('pd'+i);
+    dot.classList.toggle('filled', i < pinEntry.length);
+    dot.classList.remove('error');
+  }
+}
+
+function checkPin() {
+  if (pinEntry === CORRECT_PIN) {
+    closePin();
+    openAdmin();
+  } else {
+    document.getElementById('pinError').textContent = 'Wrong PIN. Try again.';
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById('pd'+i);
+      dot.classList.remove('filled');
+      dot.classList.add('error');
+    }
+    setTimeout(() => {
+      pinEntry = '';
+      updatePinDisplay();
+      document.getElementById('pinError').textContent = '';
+    }, 900);
+  }
+}
+
+// ── ADMIN PANEL ──
+function openAdmin() {
+  renderAdminPanel();
+  document.getElementById('adminOverlay').classList.add('show');
+}
+function closeAdmin() {
+  document.getElementById('adminOverlay').classList.remove('show');
+}
+function saveAndClose() {
+  saveShifts();
+  renderMenu();
+  closeAdmin();
+}
+
+function renderAdminPanel() {
+  const body = document.getElementById('adminBody');
+  let html = '';
+  Object.entries(MENU).forEach(([cat, data]) => {
+    html += `<div class="admin-cat-section">
+      <div class="admin-cat-title">${data.icon} ${cat}</div>`;
+    data.items.forEach(item => {
+      const key = cat+'|'+item.name;
+      const cur = itemShifts[key] || 'both';
+      html += `<div class="admin-item-row">
+        <div class="admin-item-name">${item.name} <span style="color:var(--muted);font-size:0.75rem">· Rs.${item.price}</span></div>
+        <div class="shift-toggle">
+          <button class="st-btn day ${cur==='day'?'active':''}"
+            onclick="setItemShift('${key}','day',this)">Day</button>
+          <button class="st-btn night ${cur==='night'?'active':''}"
+            onclick="setItemShift('${key}','night',this)">Night</button>
+          <button class="st-btn both ${cur==='both'?'active':''}"
+            onclick="setItemShift('${key}','both',this)">Both</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+}
+
+function setItemShift(key, shift, btn) {
+  itemShifts[key] = shift;
+  const row = btn.closest('.admin-item-row');
+  row.querySelectorAll('.st-btn').forEach(b => {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  saveShifts(); // auto-save on every change
+}
+
+// ── INIT ──
+loadShifts();
+renderMenu();
+</script>
+</body>
+</html>
