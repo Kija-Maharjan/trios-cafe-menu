@@ -361,15 +361,35 @@ body.night .item-price { color: var(--sage-light); }
 
 .admin-item-row {
   display: grid;
-  grid-template-columns: 1fr 100px 100px 100px;
+  grid-template-columns: 1fr 160px;
   gap: 8px; align-items: center;
-  padding: 6px 8px; border-radius: 8px;
+  padding: 8px 8px; border-radius: 8px;
   border-bottom: 1px solid rgba(212,184,150,0.15);
   font-size: 0.82rem;
 }
 .admin-item-row:last-child { border-bottom: none; }
 .admin-item-row:hover { background: var(--cream); }
 .admin-item-name { color: var(--ink); font-weight: 500; }
+
+.price-input-wrap {
+  display: flex; align-items: center;
+  border: 1.5px solid var(--parchment);
+  border-radius: 8px; overflow: hidden;
+  background: var(--white);
+}
+.price-input-wrap span {
+  padding: 4px 6px; font-size: 0.68rem;
+  color: var(--muted); background: var(--cream);
+  border-right: 1px solid var(--parchment);
+  white-space: nowrap;
+}
+.price-input-wrap input {
+  border: none; outline: none; background: none;
+  width: 100%; padding: 4px 6px;
+  font-family: 'Jost', sans-serif; font-size: 0.82rem;
+  color: var(--ink); font-weight: 600;
+}
+.price-input-wrap input:focus { background: var(--sage-pale); }
 
 .shift-toggle {
   display: flex; border-radius: 8px; overflow: hidden;
@@ -414,7 +434,7 @@ body.night footer { border-top-color: var(--night-border); color: #4E7261; }
   .logo-sub { display: none; }
   .content { padding: 1rem 1rem 4rem; }
   .admin-item-row { grid-template-columns: 1fr; gap: 4px; }
-  .admin-item-row .shift-toggle { max-width: 200px; }
+  .admin-item-row .shift-toggle, .admin-item-row .price-input-wrap { max-width: 200px; }
 }
 </style>
 </head>
@@ -447,7 +467,7 @@ body.night footer { border-top-color: var(--night-border); color: #4E7261; }
   <div class="logo-area">
     <div class="logo-icon">☕</div>
     <div>
-      <div class="logo-text">Trio's Café</div>
+      <div class="logo-text">Trio's Café Made by Kija Maharjan</div>
       <div class="logo-sub">Kathmandu</div>
     </div>
   </div>
@@ -515,7 +535,7 @@ body.night footer { border-top-color: var(--night-border); color: #4E7261; }
       <button class="admin-close" onclick="closeAdmin()">✕ Close</button>
     </div>
     <div class="admin-note">
-      Set each item to <strong>Day</strong>, <strong>Night</strong>, or <strong>Both</strong> shifts. Changes save instantly to your browser.
+      Set <strong>☀️ Day</strong> and <strong>🌙 Night</strong> prices per item. Leave a price <strong>empty</strong> to hide that item from that shift. Changes save instantly.
     </div>
     <div class="admin-body" id="adminBody"></div>
     <div class="admin-save-bar">
@@ -683,34 +703,62 @@ const MENU = {
 };
 
 // ── STATE ──
+// itemData[key] = { dayPrice: '120', nightPrice: '150' }
+// Empty string = item hidden for that shift. Both empty = hidden everywhere.
 const CORRECT_PIN = '5867';
 let currentShift = 'day';
 let pinEntry = '';
-let itemShifts = {};  // { 'Category|ItemName': 'day'|'night'|'both' }
+let itemData = {};
 
-// Load saved shifts from localStorage
+function defaultEntry(defaultPrice) {
+  return { dayPrice: String(defaultPrice), nightPrice: String(defaultPrice) };
+}
+
 function loadShifts() {
   try {
-    const saved = localStorage.getItem('triosMenuShifts');
-    if (saved) itemShifts = JSON.parse(saved);
-    else initDefaultShifts();
+    const saved = localStorage.getItem('triosMenuData2');
+    if (saved) {
+      itemData = JSON.parse(saved);
+      Object.entries(MENU).forEach(([cat, data]) => {
+        data.items.forEach(item => {
+          const key = cat+'|'+item.name;
+          if (!itemData[key]) itemData[key] = defaultEntry(item.price);
+        });
+      });
+    } else {
+      initDefaultShifts();
+    }
   } catch(e) { initDefaultShifts(); }
 }
 
 function initDefaultShifts() {
   Object.entries(MENU).forEach(([cat, data]) => {
     data.items.forEach(item => {
-      itemShifts[cat+'|'+item.name] = 'both';
+      itemData[cat+'|'+item.name] = defaultEntry(item.price);
     });
   });
 }
 
 function saveShifts() {
-  localStorage.setItem('triosMenuShifts', JSON.stringify(itemShifts));
+  localStorage.setItem('triosMenuData2', JSON.stringify(itemData));
 }
 
-function getShift(cat, name) {
-  return itemShifts[cat+'|'+name] || 'both';
+function getDayPrice(cat, name)   { const e = itemData[cat+'|'+name]||{}; return e.dayPrice   != null ? e.dayPrice   : ''; }
+function getNightPrice(cat, name) { const e = itemData[cat+'|'+name]||{}; return e.nightPrice != null ? e.nightPrice : ''; }
+
+function getDisplayPrice(cat, name) {
+  const e = itemData[cat+'|'+name] || {};
+  if (currentShift === 'day')   return e.dayPrice   || '';
+  if (currentShift === 'night') return e.nightPrice || '';
+  return e.dayPrice || e.nightPrice || '';
+}
+
+function isVisibleInShift(cat, name, shift) {
+  const e = itemData[cat+'|'+name] || {};
+  if (shift === 'day')   return e.dayPrice   !== '' && e.dayPrice   != null;
+  if (shift === 'night') return e.nightPrice !== '' && e.nightPrice != null;
+  return (e.dayPrice !== '' && e.dayPrice != null) ||
+         (e.nightPrice !== '' && e.nightPrice != null);
 }
 
 // ── LANDING ──
@@ -734,23 +782,36 @@ function renderMenuAll() {
   const content = document.getElementById('menuContent');
   let html = '';
   Object.entries(MENU).forEach(([cat, data]) => {
+    const visible = data.items.filter(item => isVisibleInShift(cat, item.name, 'both'));
+    if (!visible.length) return;
     html += `<div class="cat-section">
       <div class="cat-header">
         <span class="cat-icon">${data.icon}</span>
         <span class="cat-name">${cat}</span>
-        <span class="cat-count">${data.items.length}</span>
+        <span class="cat-count">${visible.length}</span>
       </div>`;
-    data.items.forEach(item => {
+    visible.forEach(item => {
+      const dp = getDayPrice(cat, item.name);
+      const np = getNightPrice(cat, item.name);
+      const samePrice = dp === np;
       html += `<div class="item-row">
         <div class="item-left">
           <span class="item-emoji">${data.icon}</span>
           <span class="item-name">${item.name}</span>
         </div>
-        <span class="item-price"><span class="currency">Rs. </span>${item.price}</span>
+        <span class="item-price">
+          ${samePrice
+            ? `<span class="currency">Rs. </span>${dp}`
+            : `<span style="font-size:0.75rem;color:var(--muted)">☀️</span><span class="currency"> Rs.</span>${dp}
+               <span style="margin:0 4px;color:var(--muted)">·</span>
+               <span style="font-size:0.75rem;color:var(--muted)">🌙</span><span class="currency"> Rs.</span>${np}`
+          }
+        </span>
       </div>`;
     });
     html += `</div>`;
   });
+  if (!html) html = '<div class="no-items">No items available.</div>';
   document.getElementById('menuContent').innerHTML = html;
 }
 
@@ -769,10 +830,7 @@ function renderMenu() {
   const content = document.getElementById('menuContent');
   let html = '';
   Object.entries(MENU).forEach(([cat, data]) => {
-    const visible = data.items.filter(item => {
-      const s = getShift(cat, item.name);
-      return s === 'both' || s === currentShift;
-    });
+    const visible = data.items.filter(item => isVisibleInShift(cat, item.name, currentShift));
     if (!visible.length) return;
     html += `<div class="cat-section">
       <div class="cat-header">
@@ -781,12 +839,13 @@ function renderMenu() {
         <span class="cat-count">${visible.length}</span>
       </div>`;
     visible.forEach(item => {
+      const price = getDisplayPrice(cat, item.name);
       html += `<div class="item-row">
         <div class="item-left">
           <span class="item-emoji">${data.icon}</span>
           <span class="item-name">${item.name}</span>
         </div>
-        <span class="item-price"><span class="currency">Rs. </span>${item.price}</span>
+        <span class="item-price"><span class="currency">Rs. </span>${price}</span>
       </div>`;
     });
     html += `</div>`;
@@ -872,16 +931,22 @@ function renderAdminPanel() {
       <div class="admin-cat-title">${data.icon} ${cat}</div>`;
     data.items.forEach(item => {
       const key = cat+'|'+item.name;
-      const cur = itemShifts[key] || 'both';
+      const entry = itemData[key] || defaultEntry(item.price);
+      const dp = entry.dayPrice != null ? entry.dayPrice : item.price;
+      const np = entry.nightPrice != null ? entry.nightPrice : item.price;
       html += `<div class="admin-item-row">
-        <div class="admin-item-name">${item.name} <span style="color:var(--muted);font-size:0.75rem">· Rs.${item.price}</span></div>
-        <div class="shift-toggle">
-          <button class="st-btn day ${cur==='day'?'active':''}"
-            onclick="setItemShift('${key}','day',this)">Day</button>
-          <button class="st-btn night ${cur==='night'?'active':''}"
-            onclick="setItemShift('${key}','night',this)">Night</button>
-          <button class="st-btn both ${cur==='both'?'active':''}"
-            onclick="setItemShift('${key}','both',this)">Both</button>
+        <div class="admin-item-name">${item.name}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="price-input-wrap" title="Day price — leave empty to hide from day menu">
+            <span>☀️ Rs.</span>
+            <input type="number" min="0" placeholder="empty=hide" value="${dp}"
+              oninput="setItemDayPrice('${key}', this.value)">
+          </div>
+          <div class="price-input-wrap" title="Night price — leave empty to hide from night menu">
+            <span>🌙 Rs.</span>
+            <input type="number" min="0" placeholder="empty=hide" value="${np}"
+              oninput="setItemNightPrice('${key}', this.value)">
+          </div>
         </div>
       </div>`;
     });
@@ -890,14 +955,16 @@ function renderAdminPanel() {
   body.innerHTML = html;
 }
 
-function setItemShift(key, shift, btn) {
-  itemShifts[key] = shift;
-  const row = btn.closest('.admin-item-row');
-  row.querySelectorAll('.st-btn').forEach(b => {
-    b.classList.remove('active');
-  });
-  btn.classList.add('active');
-  saveShifts(); // auto-save on every change
+function setItemDayPrice(key, val) {
+  if (!itemData[key]) itemData[key] = { dayPrice: '', nightPrice: '' };
+  itemData[key].dayPrice = val.trim();
+  saveShifts();
+}
+
+function setItemNightPrice(key, val) {
+  if (!itemData[key]) itemData[key] = { dayPrice: '', nightPrice: '' };
+  itemData[key].nightPrice = val.trim();
+  saveShifts();
 }
 
 // ── INIT ──
